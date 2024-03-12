@@ -30,11 +30,14 @@ package org.firstinspires.ftc.teamcode;
  */
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+
 
 @TeleOp(name = "Basic: Linear OpMode", group = "Linear OpMode")
 
@@ -46,6 +49,8 @@ public class KIWITeamCode extends LinearOpMode {
     private DcMotor leftDrive;
     private DcMotor backDrive;
     private DcMotor skyLift;
+
+    private CRServo pixelWheel;
     private CRServo droneLaunch;
 
     @Override
@@ -69,6 +74,7 @@ public class KIWITeamCode extends LinearOpMode {
         rightDrive = hardwareMap.get(DcMotor.class, "rightDrive");
         backDrive = hardwareMap.get(DcMotor.class, "backDrive");
         skyLift = hardwareMap.get(DcMotor.class, "skyLift");
+        pixelWheel = hardwareMap.get(CRServo.class, "pixelWheel");
         droneLaunch = hardwareMap.get(CRServo.class, "droneLaunch");
 
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -79,6 +85,7 @@ public class KIWITeamCode extends LinearOpMode {
         backDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         skyLift.setDirection(DcMotor.Direction.REVERSE);
         droneLaunch.setDirection(CRServo.Direction.FORWARD);
+        pixelWheel.setDirection(CRServo.Direction.FORWARD);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -107,13 +114,22 @@ public class KIWITeamCode extends LinearOpMode {
                         skyLift.setPower(0);
                     }
 
-                if (gamepad2.dpad_up) {
+                if (gamepad2.dpad_right) {
                     droneLaunch.setPower(1);
-                    } else if (gamepad2.dpad_down) {
+                    } else if (gamepad2.dpad_left) {
                         droneLaunch.setPower(-1);
                     } else {
                         droneLaunch.setPower(0);
                     }
+
+                if (gamepad2.a) {
+                    pixelWheel.setPower(1);
+                }
+                else if (gamepad2.b) {
+                    pixelWheel.setPower(-1);
+                }
+                else
+                    pixelWheel.setPower(0);
 
                 // Show the elapsed game time and wheel power.
                     telemetry.addData("Status", "Run Time: " + runtime.toString());
