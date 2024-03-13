@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 
 public class Drivetrain {
@@ -9,6 +11,8 @@ public class Drivetrain {
     public DcMotor bottomLeftDriveMotor;
     public DcMotor topRightDriveMotor;
     public DcMotor bottomRightDriveMotor;
+
+    public Servo clawServo;
 
     HardwareMap hwMap;
 
@@ -28,7 +32,7 @@ public class Drivetrain {
         bottomLeftDriveMotor = hwMap.get(DcMotor.class, "back left");
         topRightDriveMotor = hwMap.get(DcMotor.class, "front right");
         bottomRightDriveMotor = hwMap.get(DcMotor.class, "back right");
-
+        clawServo = hwMap.get(Servo.class, "clawServo");
 
         /**
          * Allow the 4 wheel motors to be run without encoders since we are doing a time based autonomous
