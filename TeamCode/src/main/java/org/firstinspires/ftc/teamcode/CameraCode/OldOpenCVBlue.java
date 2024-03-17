@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.CameraCode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -6,7 +6,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.opencv.core.*;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -17,9 +23,9 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-@TeleOp(name = "OpenCV Testing Red")
+@TeleOp(name = "OpenCV Testing Blue")
 
-public class OldOpenCVRed extends LinearOpMode {
+public class OldOpenCVBlue extends LinearOpMode {
 
     double cX = 0;
     double cY = 0;
@@ -118,8 +124,8 @@ public class OldOpenCVRed extends LinearOpMode {
             Imgproc.cvtColor(frame, hsvFrame, Imgproc.COLOR_BGR2HSV);
 
             //What color your detecting.
-            Scalar lowerYellow = new Scalar(100, 100, 100);
-            Scalar upperYellow = new Scalar(180, 255, 255);
+            Scalar lowerYellow = new Scalar(200, 100, 100);
+            Scalar upperYellow = new Scalar(255, 255, 255);
 
 
             Mat yellowMask = new Mat();
@@ -156,6 +162,22 @@ public class OldOpenCVRed extends LinearOpMode {
         double distance = (objectWidthInRealWorldUnits * focalLength) / width;
         return distance;
     }
-
-
+   /* int ATagID = 0;
+    if ((cX) < 120)
+    {
+        ATagID = 4
+    }
+    else if (cX > 240)
+    {
+        ATagID = 6
+    }
+    else
+    {
+        ATagID = 5
+    }
+    public int getLatestResults()
+    {
+        return ATagID;
+    }
+*/
 }

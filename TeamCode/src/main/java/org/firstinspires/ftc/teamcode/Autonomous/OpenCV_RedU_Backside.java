@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.opencv.core.Core;
@@ -26,14 +25,17 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name = "OpenCV_RedAutonomous")
+@Autonomous(name = "OpenCV_RedAutonomous_Backside")
 
-public class OpenCV_BlueUntested extends LinearOpMode {
+public class OpenCV_RedU_Backside extends LinearOpMode {
     private DcMotor rightDrive;
     private DcMotor leftDrive;
     private DcMotor backDrive;
-    private DcMotor skyLift;
+    private DcMotor skyLift1;
+    private DcMotor skyLift2;
     private CRServo droneLaunch;
+
+    private CRServo pixelWheel;
 
     double cX = 0;
     double cY = 0;
@@ -50,12 +52,23 @@ public class OpenCV_BlueUntested extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+
+        double vertical;
+        double horizontal;
+        double pivot;
+        double rightMotor;
+        double leftMotor;
+        double backMotor;
+        double lift;
+
         //change drive train for 3 wheel drive.
         leftDrive = hardwareMap.get(DcMotor.class, "leftDrive");
         rightDrive = hardwareMap.get(DcMotor.class, "rightDrive");
         backDrive = hardwareMap.get(DcMotor.class, "backDrive");
-        skyLift = hardwareMap.get(DcMotor.class, "skyLift");
+        skyLift1 = hardwareMap.get(DcMotor.class, "skyLift1");
+        skyLift2 = hardwareMap.get(DcMotor.class, "skyLift2");
         droneLaunch = hardwareMap.get(CRServo.class, "droneLaunch");
+        pixelWheel = hardwareMap.get(CRServo.class, "pixelWheel");
 
         initOpenCV();
         FtcDashboard dashboard = FtcDashboard.getInstance();
@@ -70,82 +83,121 @@ public class OpenCV_BlueUntested extends LinearOpMode {
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backDrive.setDirection(DcMotor.Direction.REVERSE);
         backDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        skyLift.setDirection(DcMotor.Direction.REVERSE);
+        skyLift1.setDirection(DcMotor.Direction.REVERSE);
+        skyLift2.setDirection(DcMotor.Direction.REVERSE);
+
         droneLaunch.setDirection(CRServo.Direction.FORWARD);
 
-        while (opModeIsActive()) {
-            int reference = 3;
+        if (opModeIsActive()) {
+
+
+        int reference = 3;
+
+            //while (reference == 3){zeroMotors();}
             telemetry.addData("Coordinate", "(" + (int) cX + ", " + (int) cY + ")");
             telemetry.addData("Distance in Inch", (getDistance(width)));
             rightDrive.setPower(0);
             leftDrive.setPower(0);
             backDrive.setPower(0);
+
             //frontright.setPower(0);
             // To be change, Needs calibration for Kiwi
-            if (cY > 267 && cY < 288){
-                if (cX > 50 && cX < 139){
+            //
+            if (cY > 235 && cY < 264){
+                if (cX > 15 && cX < 53){
                     telemetry.addData("Left","(" + (int) cX + ", " + (int) cY + ")" );
+                    //Red spike mark is left
                     reference = 0;
                 }
             }
-            if (cY > 245 && cY < 264){
-                if (cX > 177 && cX < 437){
+            if (cY > 236 && cY < 238){
+                if (cX > 160 && cX < 464){
                     telemetry.addData("Middle","(" + (int) cX + ", " + (int) cY + ")" );
+                    //Red spike mark is midde
                     reference = 1;
                 }
             }
-            if (cY > 247 && cY < 99) {
-                if (cX > 495 && cX < 631) {
+            if (cY > 243 && cY < 270) {
+                if (cX > 600 && cX < 627) {
                     telemetry.addData("Right", "(" + (int) cX + ", " + (int) cY + ")");
+                    //Red spike mark is right
                    reference = 2;
                 }
             }
             //Values are based on Botlobster, please CAREFULLY change setpower and sleep till you get intended result.
             //Randomized towards the left
-            if (reference == 0) {
-                rightDrive.setPower(0.50);
-                leftDrive.setPower(-0.50);
-                backDrive.setPower(-0.50);
+            // First Bot will turn 360 to set
 
-                //frontright.setPower(0.50);
-                sleep(1190);
-                /*backleft.setPower(0.5);
-                backright.setPower(0.5);
-                frontleft.setPower(0.5);
-                frontright.setPower(0.5);
-                sleep(2500);*/
+            // if spike is left
+            if (reference == 0) {
+                //Move towards spike mark.
+               moveY(0.5,800);
+               //Turn 90 degrees counterclockwise to face spike mark.
+               turn(-0.5,875);
+               //whip out claw
+               AutoskyLift(0.5, 250);
+               //Open claw, release pixels.
+               pixelWheel.setPower(-0.5);
+               sleep(800);
+               //claw goes back into position
+               AutoskyLift(-0.5, 250);
+               //strafe right
+                moveX(0.5, 800);
+                //Move backwards to park
+                moveY(0.5, 3000);
+
             }
             //Randomized towards the middle
             if (reference == 1) {
-                rightDrive.setPower(0.5);
-                leftDrive.setPower(-0.5);
-                backDrive.setPower(-0.5);
+                //Move towards Pixel
+                moveY(0.5, 1000);
+
+                //Turn 100 degrees to face
+                turn(0.5, 1750);
+
+                //whip out Claw arm out
+                AutoskyLift(0.5, 250);
+
+                //open claw to release pixels (20 Points)
+                pixelWheel.setPower(-0.5);
+                sleep(800);
+
+                //claw goes back in  position.
+                AutoskyLift(-0.5, 250);
+
+                //turn 90 degrees, facing blue back board
+                turn(0.5, 875);
+
+                // Move Backwards, Park
+                moveY(-0.5,3000);
+
+                /* //backDrive.setPower(-0.5);
                // backDrive.setPower(0.5);
                 sleep(1190);
                 rightDrive.setPower(0.5);
                 leftDrive.setPower(0.5);
                 backDrive.setPower(0.5);
                 //frontright.setPower(0.5);
-                sleep(2500);
+                sleep(2500); */
 
             }
             //Randomized towards the right
             if (reference == 2) {
-                rightDrive.setPower(0.5);
-                leftDrive.setPower(-0.5);
-                backDrive.setPower(-0.5);
-                //frontright.setPower(0.5);
-                sleep(1190);
-                rightDrive.setPower(-0.4);
-                leftDrive.setPower(-0.4);
-                backDrive.setPower(-0.4);
-                //frontright.setPower(-0.4);
-                sleep(500);
-                rightDrive.setPower(0.5);
-                leftDrive.setPower(0.5);
-                backDrive.setPower(0.5);
-                //frontright.setPower(0.5);
-                sleep(2500);
+                //Move towards spike mark.
+                moveY(0.5,800);
+                //Turn 90 degrees clockwise to face spike mark.
+                turn(0.5,875);
+                //whip out claw
+                AutoskyLift(0.5, 250);
+                //Open claw, release pixels.
+                pixelWheel.setPower(-0.5);
+                sleep(800);
+                //claw goes back into position
+                AutoskyLift(-0.5, 250);
+                //strafe left
+                moveX(-0.5, 800);
+                //Move backwards at blue back board to park
+
             }
             telemetry.update();
 
@@ -256,5 +308,45 @@ public class OpenCV_BlueUntested extends LinearOpMode {
         return distance;
     }
 
+    private void moveY(double power, int waitTime) {
+        rightDrive.setPower(power * Math.sqrt(3)/2 );
+        leftDrive.setPower(power * Math.sqrt(3)/2 );
+        sleep(waitTime);
+        zeroMotors();
+    }
+    // This function will have the robot strafeat specified power for specified milliseconds
+    private void moveX(double power, int waitTime) {
+        rightDrive.setPower (-0.5 * power);
+        leftDrive.setPower (0.5 * power);
+        backDrive.setPower (0.8 * power);
+        sleep(waitTime);
+        zeroMotors();
+    }
 
+    // This function will move the robot at specified power for specified milliseconds
+    private void turn(double power, int waitTime) {
+        rightDrive.setPower (-power);
+        leftDrive.setPower (power);
+        backDrive.setPower (-power);
+        sleep(waitTime);
+        zeroMotors();
+
+    }
+
+    private void AutoskyLift(double power, double waitTime){
+        skyLift1.setPower (power);
+        skyLift2.setPower (power);
+        zeroMotors();
+    }
+    // This turns of all moving motors
+    private void zeroMotors() {
+        rightDrive.setPower (0);
+        leftDrive.setPower (0);
+        backDrive.setPower (0);
+        skyLift1.setPower(0);
+        skyLift2.setPower(0);
+
+    }
 }
+
+

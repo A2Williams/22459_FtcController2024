@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package TeleOps;
 
 /* Copyright (c) 2017 FIRST. All rights reserved.
  *
@@ -48,10 +48,11 @@ public class KIWITeamCode extends LinearOpMode {
     private DcMotor rightDrive;
     private DcMotor leftDrive;
     private DcMotor backDrive;
-    private DcMotor skyLift;
-
+    private DcMotor skyLift1;
+    private DcMotor skyLift2;
     private CRServo pixelWheel;
     private CRServo droneLaunch;
+
 
     @Override
     public void runOpMode() {
@@ -73,7 +74,8 @@ public class KIWITeamCode extends LinearOpMode {
         leftDrive = hardwareMap.get(DcMotor.class, "leftDrive");
         rightDrive = hardwareMap.get(DcMotor.class, "rightDrive");
         backDrive = hardwareMap.get(DcMotor.class, "backDrive");
-        skyLift = hardwareMap.get(DcMotor.class, "skyLift");
+        skyLift1 = hardwareMap.get(DcMotor.class, "skyLift1");
+        skyLift2 = hardwareMap.get(DcMotor.class,"skyLift2");
         pixelWheel = hardwareMap.get(CRServo.class, "pixelWheel");
         droneLaunch = hardwareMap.get(CRServo.class, "droneLaunch");
 
@@ -83,9 +85,10 @@ public class KIWITeamCode extends LinearOpMode {
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backDrive.setDirection(DcMotor.Direction.REVERSE);
         backDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        skyLift.setDirection(DcMotor.Direction.REVERSE);
+        skyLift1.setDirection(DcMotor.Direction.REVERSE);
+        skyLift2.setDirection(DcMotor.Direction.REVERSE);
         droneLaunch.setDirection(CRServo.Direction.FORWARD);
-        pixelWheel.setDirection(CRServo.Direction.FORWARD);
+        pixelWheel.setDirection(CRServo.Direction.REVERSE);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -97,22 +100,26 @@ public class KIWITeamCode extends LinearOpMode {
             while (opModeIsActive()) {
                 vertical = gamepad1.right_stick_y;
                 horizontal = gamepad1.right_stick_x;
-                pivot = gamepad1.left_stick_x;
+                pivot = gamepad1.right_trigger - gamepad1.left_trigger;
                 rightMotor = Range.clip((-0.5 * horizontal - (Math.sqrt(3)/2) * vertical)- pivot, -1.0, 1.0);
-                leftMotor = Range.clip((-0.5 * horizontal + (Math.sqrt(3)/2) * vertical)- pivot,-1.0, 1.0);
-                backMotor = Range.clip((horizontal - pivot), -1.0, 1.0);
+                leftMotor = Range.clip((0.5 * horizontal - (Math.sqrt(3)/2) * vertical)+ pivot,-1.0, 1.0);
+                backMotor = Range.clip((0.8 * horizontal - pivot), -1.0, 1.0);
 
                 leftDrive.setPower(leftMotor);
                 rightDrive.setPower(rightMotor);
                 backDrive.setPower(backMotor);
 
-                if (gamepad2.dpad_up) {
-                    skyLift.setPower(0.75);
-                    } else if (gamepad2.dpad_down) {
-                        skyLift.setPower(-0.75);
-                    } else {
-                        skyLift.setPower(0);
-                    }
+                //lift code
+
+                float lift = gamepad2.left_stick_y;
+
+                if (Math.abs(lift)>0.05) {
+                    skyLift1.setPower(lift);
+                    skyLift2.setPower(lift);
+                } else {
+                    skyLift1.setPower(0);
+                    skyLift2.setPower(0);
+                }
 
                 if (gamepad2.dpad_right) {
                     droneLaunch.setPower(1);
